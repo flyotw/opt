@@ -21,15 +21,6 @@ message()
   fi
 }
 
-isJDK()
-{
-  if [ -z $1 ] || [ ! -x "$1/bin/java" ]; then
-    return 1
-  else
-    return 0
-  fi
-}
-
 UNAME=`which uname`
 GREP=`which egrep`
 GREP_OPTIONS=""
@@ -59,91 +50,90 @@ if [ -x "$READLINK" ]; then
   done
 fi
 
-IDE_BIN_HOME=`dirname "$SCRIPT_LOCATION"`
-if [ "$IDE_BIN_HOME" = "." ]; then
-  IDE_HOME=".."
-else
-  IDE_HOME=`dirname "$IDE_BIN_HOME"`
-fi
+cd "`dirname "$SCRIPT_LOCATION"`"
+IDE_BIN_HOME=`pwd`
+IDE_HOME=`dirname "$IDE_BIN_HOME"`
+cd "$OLDPWD"
 
 # ---------------------------------------------------------------------
 # Locate a JDK installation directory which will be used to run the IDE.
-# Try (in order): PYCHARM_JDK, pycharm.jdk, ../jre, JDK_HOME, JAVA_HOME, "java" in PATH.
+# Try (in order): PYCHARM_JDK, pycharm.jdk, ./jre64, JDK_HOME, JAVA_HOME, "java" in PATH.
 # ---------------------------------------------------------------------
-JDK=""
-if isJDK $PYCHARM_JDK; then
+if [ -n "$PYCHARM_JDK" -a -x "$PYCHARM_JDK/bin/java" ]; then
   JDK="$PYCHARM_JDK"
 fi
 
-if [ "$JDK" = "" ] && [ -s "$HOME/.PyCharmCE2017.1/config/pycharm.jdk" ]; then
-  JDK=`"$CAT" $HOME/.PyCharmCE2017.1/config/pycharm.jdk`
-  if [ ! -d "$JDK" ]; then
-    JDK="$IDE_HOME/$JDK"
+if [ -z "$JDK" -a -s "$HOME/.PyCharmCE2017.2/config/pycharm.jdk" ]; then
+  USER_JRE=`"$CAT" $HOME/.PyCharmCE2017.2/config/pycharm.jdk`
+  if [ ! -d "$USER_JRE" ]; then
+    USER_JRE="$IDE_HOME/$USER_JRE"
   fi
-  if ! isJDK $JDK; then
-    JDK=""
+  if [ -x "$USER_JRE/bin/java" ]; then
+    JDK="$USER_JRE"
   fi
 fi
 
-if [ "$JDK" = "" ] && [ "$OS_TYPE" = "Linux" ] &&
-   [ -x "$IDE_HOME/jre64/bin/java" ] && "$IDE_HOME/jre64/bin/java" -version > /dev/null 2>&1 ; then
-  JDK="$IDE_HOME/jre64"
+if [ -z "$JDK" -a "$OS_TYPE" = "Linux" ] ; then
+  BUNDLED_JRE="$IDE_HOME/jre64"
+  if [ ! -d "$BUNDLED_JRE" ]; then
+    BUNDLED_JRE="$IDE_HOME/jre"
+  fi
+  if [ -x "$BUNDLED_JRE/bin/java" ] && "$BUNDLED_JRE/bin/java" -version > /dev/null 2>&1 ; then
+    JDK="$BUNDLED_JRE"
+  fi
 fi
 
-if [ "$JDK" = "" ] && isJDK $JDK_HOME; then
+if [ -z "$JDK" -a -n "$JDK_HOME" -a -x "$JDK_HOME/bin/java" ]; then
   JDK="$JDK_HOME"
 fi
 
-if [ "$JDK" = "" ]; then
-  if isJDK $JAVA_HOME; then
-    JDK="$JAVA_HOME"
-  else
-    JAVA_BIN_PATH=`which java`
-    if [ -n "$JAVA_BIN_PATH" ]; then
-      if [ "$OS_TYPE" = "FreeBSD" -o "$OS_TYPE" = "MidnightBSD" ]; then
-        JAVA_LOCATION=`JAVAVM_DRYRUN=yes java | "$GREP" '^JAVA_HOME' | "$CUT" -c11-`
-        if [ -x "$JAVA_LOCATION/bin/java" ]; then
-          JDK="$JAVA_LOCATION"
-        fi
-      elif [ "$OS_TYPE" = "SunOS" ]; then
-        JAVA_LOCATION="/usr/jdk/latest"
-        if [ -x "$JAVA_LOCATION/bin/java" ]; then
-          JDK="$JAVA_LOCATION"
-        fi
-      elif [ "$OS_TYPE" = "Darwin" ]; then
-        JAVA_LOCATION=`/usr/libexec/java_home`
-        if [ -x "$JAVA_LOCATION/bin/java" ]; then
-          JDK="$JAVA_LOCATION"
-        fi
-      fi
-    fi
+if [ -z "$JDK" -a  -n "$JAVA_HOME" -a -x "$JAVA_HOME/bin/java" ]; then
+  JDK="$JAVA_HOME"
+fi
 
-    if [ -z "$JDK" -a -x "$READLINK" -a -x "$XARGS" -a -x "$DIRNAME" ]; then
-      JAVA_LOCATION=`"$READLINK" -f "$JAVA_BIN_PATH"`
-      case "$JAVA_LOCATION" in
-        */jre/bin/java)
-          JAVA_LOCATION=`echo "$JAVA_LOCATION" | "$XARGS" "$DIRNAME" | "$XARGS" "$DIRNAME" | "$XARGS" "$DIRNAME"`
-          if [ ! -d "$JAVA_LOCATION/bin" ]; then
-            JAVA_LOCATION="$JAVA_LOCATION/jre"
-          fi
-          ;;
-        *)
-          JAVA_LOCATION=`echo "$JAVA_LOCATION" | "$XARGS" "$DIRNAME" | "$XARGS" "$DIRNAME"`
-          ;;
-      esac
+if [ -z "$JDK" ]; then
+  JDK_PATH=`which java`
+
+  if [ -n "$JDK_PATH" ]; then
+    if [ "$OS_TYPE" = "FreeBSD" -o "$OS_TYPE" = "MidnightBSD" ]; then
+      JAVA_LOCATION=`JAVAVM_DRYRUN=yes java | "$GREP" '^JAVA_HOME' | "$CUT" -c11-`
+      if [ -x "$JAVA_LOCATION/bin/java" ]; then
+        JDK="$JAVA_LOCATION"
+      fi
+    elif [ "$OS_TYPE" = "SunOS" ]; then
+      JAVA_LOCATION="/usr/jdk/latest"
+      if [ -x "$JAVA_LOCATION/bin/java" ]; then
+        JDK="$JAVA_LOCATION"
+      fi
+    elif [ "$OS_TYPE" = "Darwin" ]; then
+      JAVA_LOCATION=`/usr/libexec/java_home`
       if [ -x "$JAVA_LOCATION/bin/java" ]; then
         JDK="$JAVA_LOCATION"
       fi
     fi
   fi
+
+  if [ -z "$JDK" -a -x "$READLINK" -a -x "$XARGS" -a -x "$DIRNAME" ]; then
+    JAVA_LOCATION=`"$READLINK" -f "$JDK_PATH"`
+    case "$JAVA_LOCATION" in
+      */jre/bin/java)
+        JAVA_LOCATION=`echo "$JAVA_LOCATION" | "$XARGS" "$DIRNAME" | "$XARGS" "$DIRNAME" | "$XARGS" "$DIRNAME"`
+        if [ ! -d "$JAVA_LOCATION/bin" ]; then
+          JAVA_LOCATION="$JAVA_LOCATION/jre"
+        fi
+        ;;
+      *)
+        JAVA_LOCATION=`echo "$JAVA_LOCATION" | "$XARGS" "$DIRNAME" | "$XARGS" "$DIRNAME"`
+        ;;
+    esac
+    if [ -x "$JAVA_LOCATION/bin/java" ]; then
+      JDK="$JAVA_LOCATION"
+    fi
+  fi
 fi
 
 JAVA_BIN="$JDK/bin/java"
-if [ ! -x "$JAVA_BIN" ]; then
-  JAVA_BIN="$JDK/jre/bin/java"
-fi
-
-if [ -z "$JDK" ] || [ ! -x "$JAVA_BIN" ]; then
+if [ -z "$JDK" -o ! -x "$JAVA_BIN" ]; then
   message "No JDK found. Please validate either PYCHARM_JDK, JDK_HOME or JAVA_HOME environment variable points to valid JDK installation."
   exit 1
 fi
@@ -166,9 +156,12 @@ VM_OPTIONS_FILE=""
 if [ -n "$PYCHARM_VM_OPTIONS" -a -r "$PYCHARM_VM_OPTIONS" ]; then
   # explicit
   VM_OPTIONS_FILE="$PYCHARM_VM_OPTIONS"
-elif [ -r "$HOME/.PyCharmCE2017.1/pycharm$BITS.vmoptions" ]; then
+elif [ -r "$IDE_HOME.vmoptions" ]; then
+  # Toolbox
+  VM_OPTIONS_FILE="$IDE_HOME.vmoptions"
+elif [ -r "$HOME/.PyCharmCE2017.2/config/pycharm$BITS.vmoptions" ]; then
   # user-overridden
-  VM_OPTIONS_FILE="$HOME/.PyCharmCE2017.1/pycharm$BITS.vmoptions"
+  VM_OPTIONS_FILE="$HOME/.PyCharmCE2017.2/config/pycharm$BITS.vmoptions"
 elif [ -r "$IDE_BIN_HOME/pycharm$BITS.vmoptions" ]; then
   # default, standard installation
   VM_OPTIONS_FILE="$IDE_BIN_HOME/pycharm$BITS.vmoptions"
@@ -183,6 +176,7 @@ if [ -r "$VM_OPTIONS_FILE" ]; then
   VM_OPTIONS=`"$CAT" "$VM_OPTIONS_FILE" | "$GREP" -v "^#.*"`
 else
   message "Cannot find VM options file"
+  exit 1
 fi
 
 IS_EAP="false"
@@ -190,7 +184,7 @@ if [ "$IS_EAP" = "true" ]; then
   OS_NAME=`echo "$OS_TYPE" | "$TR" '[:upper:]' '[:lower:]'`
   AGENT_LIB="yjpagent-$OS_NAME$BITS"
   if [ -r "$IDE_BIN_HOME/lib$AGENT_LIB.so" ]; then
-    AGENT="-agentlib:$AGENT_LIB=disablealloc,delay=10000,probe_disable=*,sessionname=PyCharmCE2017.1"
+    AGENT="-agentlib:$AGENT_LIB=disablealloc,delay=10000,probe_disable=*,sessionname=PyCharmCE2017.2"
   fi
 fi
 
@@ -216,7 +210,7 @@ LD_LIBRARY_PATH="$IDE_BIN_HOME:$LD_LIBRARY_PATH" "$JAVA_BIN" \
   ${VM_OPTIONS} \
   "-XX:ErrorFile=$HOME/java_error_in_PYCHARM_%p.log" \
   "-XX:HeapDumpPath=$HOME/java_error_in_PYCHARM.hprof" \
-  -Didea.paths.selector=PyCharmCE2017.1 \
+  -Didea.paths.selector=PyCharmCE2017.2 \
   "-Djb.vmOptionsFile=$VM_OPTIONS_FILE" \
   ${IDE_PROPERTIES_PROPERTY} \
   -Didea.platform.prefix=PyCharmCore \

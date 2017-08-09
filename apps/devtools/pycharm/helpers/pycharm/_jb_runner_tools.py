@@ -163,10 +163,9 @@ PARSE_FUNC = None
 
 
 class NewTeamcityServiceMessages(_old_service_messages):
+    _latest_subtest_result = None
+    
     def message(self, messageName, **properties):
-        # Intellij may fail to process message if it has char just before it.
-        # New line has no visible affect, but saves from such cases
-        print("")
         if messageName in set(["enteredTheMatrix", "testCount"]):
             _old_service_messages.message(self, messageName, **properties)
             return
@@ -237,7 +236,7 @@ class NewTeamcityServiceMessages(_old_service_messages):
 
         # closing subtest
         test_name = ".".join(TREE_MANAGER.current_branch)
-        if self._latest_subtest_result == "Failure":
+        if self._latest_subtest_result in set(["Failure", "Error"]):
             self.testFailed(test_name)
         if self._latest_subtest_result == "Skip":
             self.testIgnored(test_name)
@@ -400,4 +399,4 @@ def jb_doc_args(framework_name, args):
     Runner encouraged to report its arguments to user with aid of this function
 
     """
-    print("Launching {0} with arguments {1} in {2}".format(framework_name, " ".join(args), os.getcwd()))
+    print("Launching {0} with arguments {1} in {2}\n".format(framework_name, " ".join(args), os.getcwd()))

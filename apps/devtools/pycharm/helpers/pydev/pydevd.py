@@ -10,7 +10,7 @@ import os
 import sys
 import traceback
 
-from _pydevd_bundle.pydevd_constants import IS_JYTH_LESS25, IS_PY3K, IS_PY34_OLDER, get_thread_id, dict_keys, dict_contains, \
+from _pydevd_bundle.pydevd_constants import IS_JYTH_LESS25, IS_PY3K, IS_PY34_OR_GREATER, get_thread_id, dict_keys, dict_contains, \
     dict_iter_items, DebugInfoHolder, PYTHON_SUSPEND, STATE_SUSPEND, STATE_RUN, get_frame, xrange, \
     clear_cached_thread_id, INTERACTIVE_MODE_AVAILABLE
 from _pydev_bundle import fix_getpass
@@ -35,8 +35,9 @@ from _pydevd_bundle.pydevd_comm import CMD_SET_BREAK, CMD_SET_NEXT_STATEMENT, CM
 from _pydevd_bundle.pydevd_custom_frames import CustomFramesContainer, custom_frames_container_init
 from _pydevd_bundle.pydevd_frame_utils import add_exception_to_frame
 from _pydevd_bundle.pydevd_kill_all_pydevd_threads import kill_all_pydev_threads
-from _pydevd_bundle.pydevd_trace_dispatch import trace_dispatch as _trace_dispatch, global_cache_skips, global_cache_frame_skips
-from _pydevd_frame_eval.pydevd_frame_eval_main import frame_eval_func, stop_frame_eval, enable_cache_frames_without_breaks, dummy_trace_dispatch
+from _pydevd_bundle.pydevd_trace_dispatch import trace_dispatch as _trace_dispatch, global_cache_skips, global_cache_frame_skips, show_tracing_warning
+from _pydevd_frame_eval.pydevd_frame_eval_main import frame_eval_func, stop_frame_eval, enable_cache_frames_without_breaks, \
+    dummy_trace_dispatch, show_frame_eval_warning
 from _pydevd_bundle.pydevd_utils import save_main_module
 from pydevd_concurrency_analyser.pydevd_concurrency_logger import ThreadingLogger, AsyncioLogger, send_message, cur_time
 from pydevd_concurrency_analyser.pydevd_thread_wrappers import wrap_threads
@@ -905,6 +906,10 @@ class PyDB:
             # we need all data to be sent to IDE even after program finishes
             CheckOutputThread(self).start()
 
+        if show_tracing_warning or show_frame_eval_warning:
+            cmd = self.cmd_factory.make_show_cython_warning_message()
+            self.writer.add_command(cmd)
+
 
     def patch_threads(self):
         try:
@@ -1574,7 +1579,7 @@ if __name__ == '__main__':
         if setup['save-threading']:
             debugger.thread_analyser = ThreadingLogger()
         if setup['save-asyncio']:
-            if IS_PY34_OLDER:
+            if IS_PY34_OR_GREATER:
                 debugger.asyncio_analyser = AsyncioLogger()
 
         apply_debugger_options(setup)
