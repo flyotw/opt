@@ -37,5 +37,6 @@ for uname in unames:
         cracked_accounts.append(combo)
 
 if len(cracked_accounts) > 0:
+    file = open("blackbox_cracked_accounts.txt", "w")
     for account in cracked_accounts:
-        print(account)
+        file.write(account)
