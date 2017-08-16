@@ -1,15 +1,2 @@
-#!/usr/bin/python3
-import os
-from subprocess import call
-#call(["systemctl", "start", "postgresql"])
-msfconsole
-db_status
-workspace
-workspace -a/-d <workspace name>
-hosts -h
-hosts -R #sets RHOSTS from db, optional -S to search by string
-hosts -c address,os_flavor -S Linux #limit 2 colummns, search linux
-hosts -c address,os_flavoer -S Linus -R #same as above but adds to RHOSTS
-
 nmap -sL <target> -
 
