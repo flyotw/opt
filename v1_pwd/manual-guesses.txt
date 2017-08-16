@@ -1,2 +1,8 @@
 admin
 Password1.
+P@ssword1.
+P@ssword1
+password1.
+p@ssword1.
+password1
+p@ssw0rd
