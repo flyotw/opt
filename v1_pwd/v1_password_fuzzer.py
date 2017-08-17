@@ -25,7 +25,7 @@ password_files = [
     #"../wordlists/SecLists/Passwords/10_million_password_list_top_10000.txt",
     #"../wordlists/SecLists/Passwords/rockyou-5.txt",
     #"../wordlists/SecLists/Passwords/cain.txt",
-    "../wordlists/SecLists/Passwords/best1050.txt"
+    "../wordlists/SecLists/Passwords/best15.txt"
 ]
 
 raw_last_names = set(utils.read_files_to_list(lastname_files))
@@ -37,10 +37,10 @@ def construct_uname(prepended_char, raw_name, is_uppercase):
     raw_username = prepended_char + raw_name
     return raw_username.upper() if is_uppercase else raw_username.lower()
 
-def construct_unames(member_api_url):
+def construct_unames(member_api_url, proxy):
     global v1_usernames
-    v1_usernames = utils.get_active_usernames(member_api_url)
-    #passwords.update(v1_usernames) #check for unchanged default passwords
+    v1_usernames = utils.get_active_usernames(member_api_url, proxy)
+    passwords.update(v1_usernames) #check for unchanged default passwords
     val = v1_usernames
     if not len(raw_last_names) == 0: #build first letter of first name, whole last name set
         for char in alphabet:
