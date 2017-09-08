@@ -15,8 +15,9 @@ def get_indexed_keywords(sheet):
         print(wordlist)
         # get the page number
         pagenum = sheet.cell_value(rowx=i, colx=0)
+        print(pagenum)
         # for each word, assign a page
-        index[pagenum].append(wordlist)
+        # index[pagenum].append(wordlist)
 
 
 get_indexed_keywords(default_sheet)
