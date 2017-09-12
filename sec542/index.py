@@ -17,8 +17,11 @@ def get_indexed_keywords(sheet):
         for word in word_list:
             word_lower = word.lower().strip()
             if index.get(word_lower, None) == None :
-                index[word_lower] = pagenum
-    print(index)
-
+                index[word_lower] = [pagenum]
+            else :
+                #update pagenum / array with duplicate locs where the word appears
+                continue
 
 get_indexed_keywords(default_sheet)
+
+print(index)
