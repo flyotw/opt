@@ -20,7 +20,9 @@ def get_indexed_keywords(sheet):
                 index[word_lower] = [pagenum]
             else :
                 #update pagenum / array with duplicate locs where the word appears
-                continue
+                lst = index[word_lower]
+                lst.append(pagenum)
+                index[word_lower] = lst
 
 get_indexed_keywords(default_sheet)
 
