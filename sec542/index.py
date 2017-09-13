@@ -18,14 +18,32 @@ def get_indexed_keywords(sheet):
         # for each word, assign a page(s)
         for word in word_list:
             word_lower = word.lower().strip()
-            if index.get(word_lower, None) == None :
+            if index.get(word_lower, None) == None:
                 index[word_lower] = [pagenum]
             else :
                 #update pagenum / array with duplicate locs where the word appears
                 lst = index[word_lower]
-                if not pagenum in lst :
+                if not pagenum in lst:
                     lst.append(pagenum)
-                index[word_lower] = lst
+                    index[word_lower] = lst
     return index
-indexed_keywords = sorted(get_indexed_keywords(default_sheet).items(), key=operator.itemgetter(1))
-print(indexed_keywords)
+
+def check_index_type(index):
+    if type(indexed_keywords) is not dict: raise Exception(
+        'Dictionary type expected, but got: ' + str(type(indexed_keywords)
+    ))
+
+def sort_index(indexed_keywords):
+    check_index_type(indexed_keywords)
+    return sorted(indexed_keywords.items(), key=operator.itemgetter(1))
+
+def display(indexed_keywords):
+    check_index_type(indexed_keywords)
+    for key, value in indexed_keywords:
+        print(key, value)
+
+indexed_keywords = get_indexed_keywords(default_sheet)
+
+sorted = sort_index(indexed_keywords)
+
+display(sorted)
