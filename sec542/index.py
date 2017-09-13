@@ -35,7 +35,7 @@ def check_index_type(index):
 
 def sort_index(indexed_keywords):
     check_index_type(indexed_keywords)
-    return sorted(indexed_keywords.items(), key=operator.itemgetter(1))
+    return sorted(indexed_keywords.items(), key=operator.itemgetter(0, 1))
 
 def display(indexed_keywords):
     check_index_type(indexed_keywords)
