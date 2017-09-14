@@ -13,6 +13,7 @@ call(["apt-get", "install", "gitk", "-y"])
 call(["apt-get", "install", "git-gui", "-y"])
 call(["apt-get", "install", "chkrootkit", "-y"])
 call(["apt-get", "install", "virtualbox", "-y"])
+call(["apt-get", "install", "kali-linux-web", "-y"])
 call(["apt", "autoremove", "-y"])
 
 call(["chkrootkit"])
