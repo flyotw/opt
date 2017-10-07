@@ -1,0 +1,7 @@
+*.pyc
+db
+celerybeat
+.git
+static/*admin
+venv
+docs

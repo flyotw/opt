@@ -1,0 +1,71 @@
+{% extends "map/base.html" %}
+
+{% load staticfiles %}
+
+{% block title %}
+  Pushpin | Map | {{ location.name }}
+{% endblock title %}
+
+{% block extra_js %}
+<script src="http://maps.google.com/maps/api/js?sensor=false" charset="utf-8"></script>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="{% static "js/jquery.linkify.min.js" %}" charset="utf-8"></script>
+<!--<script src="{% static "js/timeline.js" %}" charset="utf-8"></script>-->
+<script src="{% static "js/map.js" %}" charset="utf-8"></script>
+{% endblock %}
+
+{% block embedded_js %}
+  // NOTE: this is only here so that it can be used with templating. Ew.
+  // TODO turn this into an AJAX call (or something)
+  BACKEND.loc = {"name": "{{location}}", "lat":{{location.latitude}}, "lon": {{location.longitude}}, "rad":{{location.radius}}};
+{% endblock embedded_js %}
+
+
+{% block media-toggle %}
+<li id="map-toggle" class="active"><a href="#">Map</a></li>
+<li id="media-toggle"><a href="{% url 'map:media view' location %}">Media</a></li>
+{% endblock %}
+
+{% block body %}
+    {% block nav %}
+    <div id="sources" class="rounded shaded">
+        <div id="filter">
+          {% for source in sources %}
+            <input type="checkbox" id="{{ source }}" onchange="MAP.toggleMarkers('{{ source }}');" checked="checked"/>{{ source }}<br />
+          {% endfor %}
+        </div>
+        <div id="summary"></div>
+    </div>
+    {% endblock nav %}
+
+    {% block map %}
+    <div class="map" id="map">
+      <div class="loading">
+        <img src="{% static "images/loading.gif" %}" alt="loading spinner"></img>
+        <span>Data is loading...</span>
+      </div>
+    </div>
+    {% endblock map %}
+
+    <script type="text/template" id="pushpinTemplate">
+      <div>
+        <table>
+          <tr>
+            <td class='prof_cell'>
+              <a href='<%- media_url %>' target='_blank'>
+                <img class='prof_img rounded' src='<%- thumb_url %>' />
+              </a>
+            </td>
+            <td class='data_cell'>
+              [<a href='<%- profile_url %>' target='_blank'><%- screen_name %></a>] <%- profile_name %>
+              <br/>
+              <%- message %>
+              <br/>
+              <span class='time'><%- date %></span>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </script>
+
+{% endblock %}

@@ -1,0 +1,6 @@
+*.pyc
+db/
+celerybeat/
+venv/
+logs/
+docs/
