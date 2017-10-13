@@ -36,7 +36,7 @@ call(["update-rc.d", "mysql", "enable"])
 call(["update-rc.d", "postgresql", "enable"])
 call(["update-rc.d", "docker", "enable"])
 
-call(["service", "apache2", "start"])
+#call(["service", "apache2", "start"])
 call(["service", "postgresql", "start"])
 call(["service", "mysql", "start"])
 call(["service", "docker", "start"])
